@@ -1,0 +1,144 @@
+package com.tcs.flume.source;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.log4j.PropertyConfigurator;
+
+public class CustomGzipSpoolStateManager
+{
+  private static final Logger logger =
+      LoggerFactory.getLogger(CustomGzipSpoolSource.class);
+
+  public enum FileProcessingState {
+    PENDING, IN_PROCESS, FAILED, SUCCEDED
+  }
+
+  protected HashMap< String, FileProcessingState > stateMap;
+  protected String filePath;
+
+  public CustomGzipSpoolStateManager( String filePath ) 
+  {
+    this.filePath = filePath + "/ssh-spool-state.out";
+    this.stateMap = new HashMap< String, FileProcessingState >();
+
+    loadMap();
+    markUnprocessedAsError();
+  }
+
+  public ArrayList< String > getPending() 
+  {
+   
+	  
+	ArrayList< String > pending = new ArrayList< String >();
+    for( Map.Entry< String, FileProcessingState > entry: stateMap.entrySet() )
+    {
+    	System.out.println(entry.getKey()+"="+entry.getValue());
+      if( entry.getValue() == FileProcessingState.PENDING )
+      {
+        pending.add( entry.getKey() );
+      }
+    }
+    System.out.println("The returning pending file is"+pending.toString());
+ 
+    return pending;
+  }
+
+  public void addProcessingList( ArrayList< String > paths ) 
+  {
+    for( String file: paths ) 
+    {
+      if( !stateMap.containsKey( file ) ) 
+      {
+        stateMap.put( file, FileProcessingState.PENDING );
+      }
+    }
+    
+    for( Map.Entry< String, FileProcessingState > entry: stateMap.entrySet() )
+    {
+    	System.out.println(entry.getKey()+"="+entry.getValue());
+    }
+    saveState();
+  }
+
+  public void markFinished( String file ) 
+  {
+    stateMap.put( file, FileProcessingState.SUCCEDED );
+    saveState();
+  }
+
+  public void markError( String file ) 
+  {
+    stateMap.put( file, FileProcessingState.FAILED );
+    saveState();
+  }
+
+  public void markInProcess( String file ) 
+  {
+    stateMap.put( file, FileProcessingState.IN_PROCESS );
+    saveState();
+  }
+
+  public void markUnprocessedAsError() 
+  {
+    for( Map.Entry< String, FileProcessingState > entry: stateMap.entrySet() )
+    {
+      if( entry.getValue() == FileProcessingState.IN_PROCESS )
+      {
+        logger.info( entry.getKey() + " is marked as in_process, updating to error " );
+        entry.setValue( FileProcessingState.FAILED );
+      }
+    }
+    saveState();
+  }
+
+  public void saveState() 
+  {
+	  PropertyConfigurator.configure("log4j.properties");
+
+    try {
+      saveMap();
+    } catch( IOException e ) {
+      logger.error( e.toString() );
+      logger.error( "SshSpoolStateManager: Unable to persist state to disk. Crashing..." );
+      System.exit(-1);
+    }
+  }
+
+  protected void saveMap() throws IOException {
+    ObjectOutputStream oos = new ObjectOutputStream (new FileOutputStream( filePath ));
+    oos.writeObject(stateMap);
+    oos.close();
+  }
+
+  protected void loadMap() 
+  {
+	  PropertyConfigurator.configure("log4j.properties");
+
+    try{ 
+      ObjectInputStream ois = new ObjectInputStream( new FileInputStream( new File(filePath) ));
+      Object readMap = ois.readObject();
+      if(readMap != null && readMap instanceof HashMap) {
+        stateMap.putAll((HashMap) readMap);
+      }
+      ois.close();
+    } catch ( FileNotFoundException e ) {
+    	System.out.println("Exception1 is "+e);
+    } catch ( IOException e ) {
+    	System.out.println("Exception2 is "+e);
+    } catch ( ClassNotFoundException e ) {
+    	System.out.println("Exception3 is "+e);
+    }
+  }
+
+}
