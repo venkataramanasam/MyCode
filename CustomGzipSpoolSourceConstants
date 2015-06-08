@@ -1,0 +1,11 @@
+package com.tcs.flume.source;
+import java.nio.charset.Charset;
+
+public class CustomGzipSpoolSourceConstants {
+
+  public static final String LOCAL_DIR_PATH    = "localPath";
+  public static final String LOCAL_PERSIST_PATH = "localPersistPath";
+  public static final String RECORD_DELIMITER = "\n";
+  public static final Charset FILE_CHARSET    = Charset.forName( "UTF-8" );
+ 
+}
