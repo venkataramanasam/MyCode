@@ -1,0 +1,604 @@
+package com.tcs.flume.source;
+
+import java.io.IOException;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+
+
+public class Jsonloader {
+	
+    public String exec(String jsonInput) throws IOException {
+
+
+        if(jsonInput == null )
+            return null;
+
+		JSONParser jsonParser = new JSONParser();
+		JSONObject jsonObject = null;
+		try {
+			
+			//String jsonInput = (String)input.get(0);
+			try {
+			jsonObject = (JSONObject)jsonParser.parse(jsonInput);
+		
+		 }catch(Exception e){
+	            System.err.println("JSON is invalid. Correcting HQ field " + e.getMessage());
+			    String fields[] = jsonInput.split("HQ\":");
+			    String fields1[] = fields[1].split("\"");
+			    String temp="\"";
+			    for(int i=1;i<(fields1.length);i++){
+			    	temp=temp+fields1[i];
+			    	System.out.println(i);
+			    	if(i==(fields1.length-1)){
+			    		temp=temp+"\"";
+			    	}
+			    	else if(i==(fields1.length-2)){
+			    		temp=temp+"\"";
+			    	}
+			    	else
+			    		temp=temp+"'";
+			    }
+			    System.out.println(temp);
+			    String validjson = fields[0]+"HQ\":"+temp;
+			    try {
+					jsonObject = (JSONObject)jsonParser.parse(validjson);
+				
+				 }catch(Exception pe){
+					 System.out.println("JSON is not valid even after correcting HQ field" + pe.getMessage());
+					 return "NOTVALID";
+				 }
+			    
+				 }
+			       
+    
+			
+			JSONObject transaction = (JSONObject) jsonObject.get("transaction");
+
+			String tstamp = (String) transaction.get("TS");
+
+			String[] dt = tstamp.split("\\ ", -1);
+
+                        String[] hhmmss = dt[1].split("\\:", -1);
+
+
+
+
+			String version = (String) transaction.get("V");
+			String pid = (String) transaction.get("PID");
+			String rsize = (String) transaction.get("RS");
+			String srsize = (String) transaction.get("SR");
+			String cid = (String) transaction.get("CnID");
+
+
+			JSONObject clientGrp = (JSONObject) transaction.get("CIPG");
+			
+			String clientip = (String) clientGrp.get("CIP");
+			String clientport = (String) clientGrp.get("CP");
+			String serverlocport = (String) clientGrp.get("SLP");
+			String serverlocalegress = (String) clientGrp.get("SLEP");
+			String clientVlanid = (String) clientGrp.get("CVID");
+
+
+			JSONObject serverGrp = (JSONObject) transaction.get("SIPG");
+
+                        String serverip = (String) serverGrp.get("SIP");
+                        String serverport = (String) serverGrp.get("SP");
+                        String serverincport  = (String) serverGrp.get("InP");
+                        String serverVlanid = (String) serverGrp.get("SVID");
+			
+
+			JSONObject timeGrp = (JSONObject) transaction.get("TG");
+
+
+			
+			String transactiontime = (String) timeGrp.get("T");
+			String responsetime = (String) timeGrp.get("R");
+			String compressiontime = (String) timeGrp.get("C");
+			String subdatalkp = (String) timeGrp.get("SDL");
+			String dnslkp = (String) timeGrp.get("DL");
+			String redinvocation = (String) timeGrp.get("I:R");
+			String uaproftime = (String) timeGrp.get("UAP");
+			String exdblkp = (String) timeGrp.get("EDBL");
+			String cattime = (String) timeGrp.get("Ca");
+			String analyticstime = (String) timeGrp.get("A");
+			String reqmod = (String) timeGrp.get("RQM");
+			String respmod = (String) timeGrp.get("RSM");
+			String contentservrestime  = (String) timeGrp.get("CSR");
+
+			String originalsize = (String) transaction.get("AS");
+			String optimisedsize = (String) transaction.get("OS");
+			String compressionpercent = (String) transaction.get("CPr");
+			String cachevalidbytes = (String) transaction.get("CVB");
+			String cachestatuscode = (String) transaction.get("CS");
+			String httpcode = (String) transaction.get("HS");
+			String sunr =  (String) jsonObject.get("SUNR");
+			String suns =  (String) jsonObject.get("SUNS");
+			String medialogstring = (String) jsonObject.get("ML");
+			String tcpsl =  (String) jsonObject.get("TCPSL");
+			String contenttype  = (String) jsonObject.get("CT");
+			String msisdn = (String) jsonObject.get("MS");
+			String emsisdn = (String) jsonObject.get("MSH");
+			String sessionid = (String) jsonObject.get("SID");
+			String susbcriberid = (String) jsonObject.get("SuID");
+			String useragent = (String) jsonObject.get("UA");
+			String deviceid = (String) jsonObject.get("DID");
+			String uagroup = (String) jsonObject.get("UAG");
+			String catid = (String) jsonObject.get("CID");
+			String httpref = (String) jsonObject.get("HR");
+			//String httpwapprof  = (String) jsonObject.get("XW");
+			String customrepgrp  = (String) jsonObject.get("CRG");
+			String customrepopt1  = (String) jsonObject.get("CP1");
+			String customrepopt2  = (String) jsonObject.get("CP2");
+			String aidf =  (String) jsonObject.get("AIDF");
+			String ucb =  (String) jsonObject.get("UCB");
+			String clid =  (String) jsonObject.get("CLID");
+			String clcl =  (String) jsonObject.get("CLCL");
+			String opts =  (String) jsonObject.get("OPTS");
+			String puag =  (String) jsonObject.get("PUAG");
+			String sslil =  (String) jsonObject.get("SSLIL");
+			JSONObject httpObject = (JSONObject) jsonObject.get("HRU");
+
+			String httpmethod = (String) httpObject.get("HM");
+			String domain = (String) httpObject.get("HD");
+			String url = (String) httpObject.get("HP");
+			String query = (String) httpObject.get("HQ");
+
+			JSONObject optObj = (JSONObject) transaction.get("OF");
+                        String  optflag1 =  (String) optObj.get("Flag1");
+                        String  optflag2 =  (String) optObj.get("Flag2");
+                        String  optflag3 =  (String) optObj.get("Flag3");
+                        String  optflag4 =  (String) optObj.get("Flag4");
+                        String  optflag5 =  (String) optObj.get("Flag5");
+                        String  optflag6 =  (String) optObj.get("Flag6");
+                        String  optflag7 =  (String) optObj.get("Flag7");
+                        String  optflag8 =  (String) optObj.get("Flag8");
+                        String  optflag9 =  (String) optObj.get("Flag9");
+                        String  optflag10 =  (String) optObj.get("Flag10");
+                        String  optflag11 =  (String) optObj.get("Flag11");
+                        String  optflag12 =  (String) optObj.get("Flag12");
+                        String  optflag13 =  (String) optObj.get("Flag13");
+                        String  optflag14 =  (String) optObj.get("Flag14");
+                        String  optflag15 =  (String) optObj.get("Flag15");
+                        String  optflag16 =  (String) optObj.get("Flag16");
+                        String  optflag17 =  (String) optObj.get("Flag17");
+                        String  optflag18 =  (String) optObj.get("Flag18");
+                        String  optflag19 =  (String) optObj.get("Flag19");
+                        String  optflag20 =  (String) optObj.get("Flag20");
+                        String  optflag21 =  (String) optObj.get("Flag21");
+                        String  optflag22 =  (String) optObj.get("Flag22");
+
+
+			JSONObject selObj = (JSONObject) transaction.get("SF");
+			
+                        String  selflag1 =  (String) selObj.get("Flag1");
+                        String  selflag2 =  (String) selObj.get("Flag2");
+                        String  selflag3 =  (String) selObj.get("Flag3");
+                        String  selflag4 =  (String) selObj.get("Flag4");
+                        String  selflag5 =  (String) selObj.get("Flag5");
+                        String  selflag6 =  (String) selObj.get("Flag6");
+                        String  selflag7 =  (String) selObj.get("Flag7");
+                        String  selflag8 =  (String) selObj.get("Flag8");
+                        String  selflag9 =  (String) selObj.get("Flag9");
+                        String  selflag10 =  (String) selObj.get("Flag10");
+                        String  selflag11 =  (String) selObj.get("Flag11");
+                        String  selflag12 =  (String) selObj.get("Flag12");
+                        String  selflag13 =  (String) selObj.get("Flag13");
+                        String  selflag14 =  (String) selObj.get("Flag14");
+                        String  selflag15 =  (String) selObj.get("Flag15");
+                        String  selflag16 =  (String) selObj.get("Flag16");
+                        String  selflag17 =  (String) selObj.get("Flag17");
+                        String  selflag18 =  (String) selObj.get("Flag18");
+                        String  selflag19 =  (String) selObj.get("Flag19");
+                        String  selflag20 =  (String) selObj.get("Flag20");
+                        String  selflag21 =  (String) selObj.get("Flag21");
+                        String  selflag22 =  (String) selObj.get("Flag22");
+                        String  selflag23 =  (String) selObj.get("Flag23");
+                        String  selflag24 =  (String) selObj.get("Flag24");
+
+			JSONObject gfObj = (JSONObject) transaction.get("GF");
+
+                        String  gfflag1 =  (String) gfObj.get("Flag1");
+                        String  gfflag2 =  (String) gfObj.get("Flag2");
+                        String  gfflag3 =  (String) gfObj.get("Flag3");
+                        String  gfflag4 =  (String) gfObj.get("Flag4");
+                        String  gfflag5 =  (String) gfObj.get("Flag5");
+                        String  gfflag6 =  (String) gfObj.get("Flag6");
+                        String  gfflag7 =  (String) gfObj.get("Flag7");
+                        String  gfflag8 =  (String) gfObj.get("Flag8");
+                        String  gfflag9 =  (String) gfObj.get("Flag9");
+                        String  gfflag10 =  (String) gfObj.get("Flag10");
+                        String  gfflag11 =  (String) gfObj.get("Flag11");
+                        String  gfflag12 =  (String) gfObj.get("Flag12");
+                        String  gfflag13 =  (String) gfObj.get("Flag13");
+                        String  gfflag14 =  (String) gfObj.get("Flag14");
+                        String  gfflag15 =  (String) gfObj.get("Flag15");
+                        String  gfflag16 =  (String) gfObj.get("Flag16");
+                        String  gfflag17 =  (String) gfObj.get("Flag17");
+                        String  gfflag18 =  (String) gfObj.get("Flag18");
+                        String  gfflag19 =  (String) gfObj.get("Flag19");
+                        String  gfflag20 =  (String) gfObj.get("Flag20");
+                        String  gfflag21 =  (String) gfObj.get("Flag21");
+                        String  gfflag22 =  (String) gfObj.get("Flag22");
+                        String  gfflag23 =  (String) gfObj.get("Flag23");
+                        String  gfflag24 =  (String) gfObj.get("Flag24");
+                        String  gfflag25 =  (String) gfObj.get("Flag25");
+                        String  gfflag26 =  (String) gfObj.get("Flag26");
+                        String  gfflag27 =  (String) gfObj.get("Flag27");
+                        String  gfflag28 =  (String) gfObj.get("Flag28");
+                        String  gfflag29 =  (String) gfObj.get("Flag29");
+                        String  gfflag30 =  (String) gfObj.get("Flag30");
+                        String  gfflag31 =  (String) gfObj.get("Flag31");
+                        String  gfflag32 =  (String) gfObj.get("Flag32");
+           String[] ci = clientip.split("\\.", -1);
+                        int cino = Integer.parseInt(ci[1]);
+   //                     System.out.println("Client IP ===>" + cino);
+
+                        String apnid;
+                        
+                        if (cino >= 0 && cino <= 31)
+                                apnid = "idata";
+                        else if (cino >= 64 && cino <= 79)
+                                apnid = "mobile";
+                        else if (cino == 120)
+                                apnid = "modem";
+                        else if (cino == 122)
+                                apnid = "bypassandtest";
+                        else if (cino == 123)
+                                apnid = "test";
+                        else if (cino >= 128 && cino <= 135)
+                                apnid = "tesco";
+                        else if (cino >= 144 && cino <= 151)
+                                apnid = "giffgaff";
+                        else if (cino >= 160 && cino <= 167)
+                                apnid = "payandgo";
+                        else if (cino >= 176 && cino <= 177)
+                                apnid = "wap";
+                        else if (cino >= 177 && cino <= 255)
+                                apnid = "unkown";
+                        else if (cino == 168)
+                                apnid = "ibrowse"; 
+                        else if (cino == 169)
+                                apnid = "mbb"; 
+                        else if (cino == 170)
+                                apnid = "idata-rm"; 
+                        else
+                                apnid = "error";
+
+
+
+                        int orgsize = Integer.parseInt(originalsize);
+
+                        String sizetag;
+                        
+                        if (orgsize < 1000)
+                                sizetag = "tiny";
+                        else if (orgsize >= 1000 && orgsize < 20000)
+                                sizetag = "small";
+                        else if (orgsize >= 20000 && orgsize < 1000000 )
+                                sizetag = "med";
+                        else if (orgsize >= 1000000  && orgsize <= 5000000 )
+                                sizetag = "large";
+                        else if (orgsize >= 5000000)
+                                sizetag = "huge";
+                        else
+                                sizetag = "error";
+
+  //                      System.out.println("size ==>" + sizetag);
+                
+                        String flag = null;
+
+                        if (gfflag26.equals("U")) flag ="NotProbed";
+                        else if (gfflag26.equals("G")) flag ="Gif";
+                        else if (gfflag26.equals("A")) flag ="Airzip";
+                        else if (gfflag26.equals("J")) flag ="JPEG";
+                        else if (gfflag26.equals("H")) flag ="HTML";
+                        else if (gfflag26.equals("j")) flag ="java";
+                        else if (gfflag26.equals("C")) flag ="CSS";
+                        else if (gfflag26.equals("W")) flag ="WMLC";
+                        else if (gfflag26.equals("F")) flag ="Flash_Video";
+                        else if (gfflag26.equals("M")) flag ="MPEG4";
+                        else if (gfflag26.equals("P")) flag ="PNG";
+                        else if (gfflag26.equals("K")) flag ="Shockwave_Flash";
+                        else if (gfflag26.equals("L")) flag ="HLS_Streaming";
+                        else if (gfflag26.equals("l")) flag ="HLS_Manifest";
+                        else if (gfflag26.equals("f")) flag ="ASF_Video";
+                        else if (gfflag26.equals("a")) flag ="ASF_Audio";
+                        else if (gfflag26.equals("N")) flag ="DRM_Movie_Nflx";
+                        else if (gfflag26.equals("n")) flag ="DRM_Audio_Nflx";
+                        else if (gfflag26.equals("S")) flag ="MM_SS_Media";
+                        else if (gfflag26.equals("s")) flag ="MS_SS_Meta";
+                        else if (gfflag26.equals("D")) flag ="Adobe_HDS_Media";
+                        else if (gfflag26.equals("d")) flag ="Adobe_HDS_Manifest";
+                        else if (gfflag26.equals("m")) flag ="Google_WebM_file";
+                        else if (gfflag26.equals("I")) flag ="MS_Streaming_Video";
+                        else if (gfflag26.equals("i")) flag ="MS_Streaming_Audio";
+                        else if (gfflag26.equals("3")) flag ="MP3";
+                        else if (gfflag26.equals("c")) flag ="AAC";
+                        else if (gfflag26.equals("T")) flag ="RTMP-T";
+                        else if (gfflag26.equals("R")) flag ="RTMP";
+                        else if (gfflag26.equals("E")) flag ="RTMPE";
+                        else if (gfflag26.equals("u")) flag ="AutoUpdate";
+                        else if (gfflag26.equals("O")) flag ="Other";
+                        else if (gfflag26.equals("-")) flag ="NotFound";
+                        else if (gfflag26.equals("NULL")) flag ="error_null";
+                        else if (gfflag26.equals("")) flag ="error_empty";               
+        
+ //                       System.out.println("GFF flag ===" + flag);
+			
+                        float ttime = Float.parseFloat(transactiontime);
+                        float osize = Float.parseFloat(optimisedsize);
+			float thput = 0;
+			if (ttime > 5000 && osize > 1000000 && cachestatuscode.contains("MISS")) thput=8*osize/ttime; 
+			else thput = 0;
+
+                        String conttype = null;
+                        String conttype_1 = null;
+			if (contenttype.equals("-")) {
+                                conttype="null";
+                                conttype_1="null";
+                        }
+                        else {
+                        	String[] ctype = contenttype.split("\\/", -1);
+                       //n System.out.println(ctype[1]);
+                        	if(ctype.length!=1){
+                        	if (ctype[1].toLowerCase().contains("octet-stream")) conttype ="octet-stream";
+                        	else if (ctype[1].toLowerCase().contains("mp4")) conttype ="mp4";
+                        	else if (ctype[1].toLowerCase().contains("png")) conttype ="png";
+                        	else if (ctype[1].toLowerCase().contains("gif")) conttype ="gif";
+                        	else if (ctype[1].toLowerCase().contains("json")) conttype ="json";
+                        	else if (ctype[1].toLowerCase().contains("xml")) conttype ="xml";
+                        	else if (ctype[1].toLowerCase().contains("binary")) conttype ="binary";
+                        	else if (ctype[1].toLowerCase().contains("zip")) conttype ="zip";
+                        	else if (ctype[1].toLowerCase().contains("apple-plist")) conttype ="apple-plist";
+                        	else if (ctype[1].toLowerCase().contains("pdf")) conttype ="pdf";
+                        	else if (ctype[1].toLowerCase().contains("mpeg")) conttype ="mpeg";
+                        	else if (ctype[1].toLowerCase().contains("aac")) conttype ="aac";
+                        	else if (ctype[1].toLowerCase().contains("mp3")) conttype ="mp3";
+                        	else if (ctype[1].toLowerCase().contains("3gp")) conttype ="3gpp";
+                        	else if (ctype[1].toLowerCase().contains("m4v")) conttype ="m4v";
+                        	else if (ctype[1].toLowerCase().contains("asf")) conttype ="asf";
+                        	else if (ctype[1].toLowerCase().contains("dash")) conttype ="dash";
+                        	else if (ctype[1].toLowerCase().contains("font")) conttype ="font";
+                        	else if (ctype[1].toLowerCase().contains("woff")) conttype ="font";
+                        	else if (ctype[1].toLowerCase().contains("tff")) conttype ="font";
+                        	else if (ctype[1].toLowerCase().contains("otf")) conttype ="font";
+                        	else if (ctype[1].toLowerCase().contains("webm")) conttype ="webm";
+                        	else if (ctype[1].toLowerCase().contains("webp")) conttype ="webp";
+	                        else if (ctype[1].toLowerCase().contains("plain")) conttype ="plaintext";
+	                        else if (ctype[1].toLowerCase().contains("avi")) conttype ="avi";
+	                        else if (ctype[1].toLowerCase().contains("flv")) conttype ="flv";
+	                        else if (ctype[1].toLowerCase().contains("quicktime")) conttype ="quicktime";
+	                        else if (ctype[1].toLowerCase().contains("f4")) conttype ="f4f";
+	                        else if (ctype[1].toLowerCase().contains("html")) conttype ="html";
+	                        else if (ctype[1].toLowerCase().contains("xml")) conttype ="xml";
+	                        else if (ctype[1].toLowerCase().contains("css")) conttype ="css";
+	                        else if (ctype[1].toLowerCase().contains("octet-stream")) conttype ="octet-stream";
+	                        else if (ctype[1].toLowerCase().contains("x-mixed-replace")) conttype ="x-mixed-replace";
+	                        else if (ctype[1].toLowerCase().contains("mms-framed")) conttype ="mms-framed";
+	                        else if (ctype[1].toLowerCase().contains("shockwave")) conttype ="shockwave-flash";
+	                        else if (ctype[1].toLowerCase().contains("vnd.android.package-delta")) conttype ="vnd.android.package-delta";
+	                        else if (ctype[1].toLowerCase().contains("vnd.android.package-archive")) conttype ="vnd.android.package-archive";
+	                        else if (ctype[1].toLowerCase().contains("java")  || ctype[1].toLowerCase().contains("js") || ctype[1].toLowerCase().contains("json")) conttype ="javascript";
+	                        else if (ctype[1].toLowerCase().contains("jpeg")  || ctype[1].toLowerCase().contains("jpg"))   conttype = "jpeg";
+	                        else if (ctype[1].toLowerCase().contains("mp2t")  || ctype[1].toLowerCase().contains("ts")) conttype ="MP2T";
+	                        else if (ctype[1].toLowerCase().equals("")) conttype ="error_empty";
+	                        else if (ctype[1].toLowerCase().equals("NULL")) conttype ="error_null";
+                        	}
+//                        System.out.println("Content type ===> " + conttype);
+                        	else{
+                        		conttype ="error_empty";
+	                        if (ctype[0].toLowerCase().contains("rtmp")) {conttype_1="Video"; conttype = "rtmp";}
+	                        else if (ctype[0].toLowerCase().equals("raw-data")) conttype_1="raw-data";
+	                        else if (ctype[0].toLowerCase().equals("-")) conttype_1="unkown";
+	                        else if (ctype[0].toLowerCase().contains("text")) conttype_1="Text";
+	                        else if (ctype[0].toLowerCase().contains("audio")) conttype_1="Audio";
+	                        else if (ctype[0].toLowerCase().contains("font")) conttype_1="Application";
+	                        else if (ctype[0].toLowerCase().contains("application") || ctype[0].toLowerCase().contains("app") || ctype[0].toLowerCase().contains("binary")) conttype_1="Application";
+	                        else if (ctype[0].toLowerCase().contains("video") || ctype[0].toLowerCase().contains("mpeg")) conttype_1="Video" ;
+	                        else if (ctype[0].toLowerCase().contains("image") || ctype[0].toLowerCase().contains("img") || ctype[0].toLowerCase().contains("jpeg")) conttype_1="Image";
+	                        else if (ctype[0].toLowerCase().equals(""))  conttype_1="NULL";
+                        	}
+			}
+
+
+String fin=      dt[0]+"\t"+hhmmss[0]+"\t"+hhmmss[1]+"\t"+hhmmss[2]+"\t"+
+                                           version+"\t"+
+                                           pid+"\t"+
+                                           rsize+"\t"+
+                                           srsize+"\t"+
+                                           cid+"\t"+
+                                           clientip+"\t"+
+                                           clientport+"\t"+
+                                           serverlocport+"\t"+
+                                           serverlocalegress+"\t"+
+                                           clientVlanid+"\t"+
+                                           serverip+"\t"+
+                                           serverport+"\t"+
+                                           serverincport+"\t"+
+                                           serverVlanid+"\t"+
+                                           transactiontime+"\t"+
+                                           responsetime+"\t"+
+                                           compressiontime+"\t"+
+                                           subdatalkp+"\t"+
+                                           dnslkp+"\t"+
+                                           redinvocation+"\t"+
+                                           uaproftime+"\t"+
+                                           exdblkp+"\t"+
+                                           cattime+"\t"+
+                                           analyticstime+"\t"+
+                                           reqmod+"\t"+
+                                           respmod+"\t"+
+                                           contentservrestime+"\t"+
+                                           originalsize+"\t"+
+                                           optimisedsize+"\t"+
+                                           compressionpercent+"\t"+
+                                           cachevalidbytes+"\t"+
+                                           cachestatuscode+"\t"+
+                                           httpcode+"\t"+
+                                           sunr+"\t"+
+                                           suns+"\t"+
+                                           medialogstring+"\t"+
+                                           tcpsl+"\t"+
+                                           contenttype+"\t"+
+msisdn+"\t"+
+emsisdn+"\t"+
+sessionid+"\t"+
+susbcriberid+"\t"+
+useragent+"\t"+
+deviceid+"\t"+
+uagroup+"\t"+
+catid+"\t"+
+httpref+"\t"+
+customrepgrp+"\t"+
+customrepopt1+"\t"+
+customrepopt2+"\t"+
+aidf+"\t"+
+ucb+"\t"+
+clid+"\t"+
+clcl+"\t"+
+opts+"\t"+
+puag+"\t"+
+sslil+"\t"+
+httpmethod+"\t"+
+domain+"\t"+
+url+"\t"+
+query+"\t"+
+ optflag1+"\t"+
+ optflag2+"\t"+
+ optflag3+"\t"+
+ optflag4+"\t"+
+ optflag5+"\t"+
+ optflag6+"\t"+
+ optflag7+"\t"+
+ optflag8+"\t"+
+ optflag9+"\t"+
+ optflag10+"\t"+
+ optflag11+"\t"+
+ optflag12+"\t"+
+ optflag13+"\t"+
+ optflag14+"\t"+
+ optflag15+"\t"+
+ optflag16+"\t"+
+ optflag17+"\t"+
+ optflag18+"\t"+
+ optflag19+"\t"+
+ optflag20+"\t"+
+ optflag21+"\t"+
+ optflag22+"\t"+
+selflag1 +"\t"+
+selflag2+"\t"+
+selflag3+"\t"+
+selflag4+"\t"+
+selflag5+"\t"+
+selflag6+"\t"+
+selflag7+"\t"+
+selflag8+"\t"+
+selflag9+"\t"+
+selflag10+"\t"+
+selflag11+"\t"+
+selflag12+"\t"+
+selflag13+"\t"+
+selflag14+"\t"+
+selflag15+"\t"+
+selflag16+"\t"+
+selflag17+"\t"+
+selflag18+"\t"+
+selflag19+"\t"+
+selflag20+"\t"+
+selflag21+"\t"+
+selflag22+"\t"+
+selflag23+"\t"+
+selflag24+"\t"+
+gfflag1+"\t"+
+gfflag2+"\t"+
+gfflag3+"\t"+
+gfflag4+"\t"+
+gfflag5+"\t"+
+gfflag6+"\t"+
+gfflag7+"\t"+
+gfflag8+"\t"+
+gfflag9+"\t"+
+gfflag10+"\t"+
+gfflag11+"\t"+
+gfflag12+"\t"+
+gfflag13+"\t"+
+gfflag14+"\t"+
+gfflag15+"\t"+
+gfflag16+"\t"+
+gfflag17+"\t"+
+gfflag18+"\t"+
+gfflag19+"\t"+
+gfflag20+"\t"+
+gfflag21+"\t"+
+gfflag22+"\t"+
+gfflag23+"\t"+
+gfflag24+"\t"+
+gfflag25+"\t"+
+gfflag26+"\t"+
+gfflag27+"\t"+
+gfflag28+"\t"+
+gfflag29+"\t"+
+gfflag30+"\t"+
+gfflag31+"\t"+
+gfflag32+"\t"+
+apnid+"\t"+
+sizetag+"\t"+
+flag+"\t"+
+conttype+"\t"+
+conttype_1+"\t"+
+thput;
+/*
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		 catch (ParseException e) {
+			e.printStackTrace();
+		}
+*/
+
+
+
+
+      return fin;
+        }catch(Exception e){
+            System.err.println("ToLower: failed to process input; error - " + e);
+            return null;
+        }
+/*	
+ 	 catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
+                 catch (ParseException e) {
+                        e.printStackTrace();
+                }
+
+*/
+
+}
+
+  /*  public Schema outputSchema(Schema input) {
+        return new Schema(new Schema.FieldSchema(getSchemaName(this.getClass().getName().toLowerCase(), input), DataType.CHARARRAY
+));
+    }
+*/
+    /* (non-Javadoc)
+ *  *      * @see org.apache.pig.EvalFunc#getArgToFuncMapping()
+ *   *           * This is needed to make sure that both bytearrays and chararrays can be passed as arguments
+ *    *                */
+/*
+    @Override
+    public List<FuncSpec> getArgToFuncMapping() throws FrontendException {
+        List<FuncSpec> funcList = new ArrayList<FuncSpec>();
+        funcList.add(new FuncSpec(this.getClass().getName(), new Schema(new Schema.FieldSchema(null, DataType.CHARARRAY))));
+
+        return funcList;
+    }
+*/
+}
