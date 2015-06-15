@@ -31,7 +31,7 @@ public class Raspberry {
             props.setProperty("mail.store.protocol", "imaps");
             Session session = Session.getInstance(props, null);
             Store store = session.getStore();
-            store.connect("imap.gmail.com", "raspberrypivenkatsam@gmail.com", "pipassword");
+            store.connect("imap.gmail.com", "raspberrypivenkatsam@gmail.com", "****");
             Folder inbox = store.getFolder("INBOX");
             inbox.open(Folder.READ_WRITE);
             Message[] msg = inbox.search(new FlagTerm(new Flags(Flag.SEEN), false));
