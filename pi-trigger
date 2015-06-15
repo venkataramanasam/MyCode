@@ -1,0 +1,61 @@
+#!/bin/bash
+
+start()
+        {
+        if [ ! -f /var/run/pilock ]
+        then
+                touch /var/run/pilock
+                /opt/code/pi-starter.sh
+                sleep 1
+                if [  -f "/var/run/pilock" ]
+                then
+                        echo -e "\e[1;32m raspberry service  \e[0;36m [started] \e[0m"
+                else
+                        echo "Error in starting the service , Please check var log messages"
+                fi
+        else
+                echo -e "\e[1;32m raspberry service \e[1;35m [Already Running] \e[0m"
+                echo -e "\n Please do restart , if the service is not proper\n"
+        fi
+        }
+stop()
+        {
+        if [ ! -f "/var/run/pilock" ]
+        then
+                echo -e "\e[1;32m raspberry service \e[1;35m [Already Stopped] \e[0m"
+        else
+                rm -rf /var/run/pilock
+                 ps aux |  awk '/raspberry/i&&/classpath/&&!/awk/ {print "kill -9 " $2}' | bash
+                echo -e "\e[1;32m raspberry service \e[0;36m [stopped] \e[0m"
+        fi
+        }
+
+status()
+        {
+        if [ -f "/var/run/pilock" ]
+        then
+                echo -e "\e[1;32m s3fs service \e[1;33m [Running] \e[0m"
+        else
+                echo -e "\e[1;32m s3fs service \e[1;35m [Not Running] \e[0m"
+        fi
+        }
+        case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status
+        ;;
+  restart)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+exit 0
+
