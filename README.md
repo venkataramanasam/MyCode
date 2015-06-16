@@ -34,3 +34,5 @@ Monitoring of toxic gas and oxygen levels inside chemical plants to ensure worke
 
 Temperature Monitoring
 Control of temperature inside industrial and medical fridges with sensitive merchandise.
+
+Predictive maintenance
