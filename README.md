@@ -36,3 +36,9 @@ Temperature Monitoring
 Control of temperature inside industrial and medical fridges with sensitive merchandise.
 
 Predictive maintenance
+
+Energy and Water Use
+Energy and water supply consumption monitoring to obtain advice on how to save cost and resources.
+
+Remote Control Appliances
+Switching on and off remotely appliances to avoid accidents and save energy.
