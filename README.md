@@ -20,3 +20,17 @@
 Smart Lighting
 Intelligent and weather adaptive lighting in street lights.
 -------------------------------------------------------------------------------------------------------------------------------------------
+Perimeter Access Control
+Access control to restricted areas and detection of people in non-authorized areas.
+
+Item Location
+Search of individual items in big surfaces like warehouses or harbours.
+
+Fleet Tracking
+Control of routes followed for delicate goods like medical drugs, jewels or dangerous merchandises.
+
+Indoor Air Quality
+Monitoring of toxic gas and oxygen levels inside chemical plants to ensure workers and goods safety.
+
+Temperature Monitoring
+Control of temperature inside industrial and medical fridges with sensitive merchandise.
