@@ -42,3 +42,9 @@ Energy and water supply consumption monitoring to obtain advice on how to save c
 
 Remote Control Appliances
 Switching on and off remotely appliances to avoid accidents and save energy.
+
+Intrusion Detection Systems
+Detection of windows and doors openings and violations to prevent intruders.
+
+Patients Surveillance
+Monitoring of conditions of patients inside hospitals and in old people's home.
