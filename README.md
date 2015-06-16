@@ -48,3 +48,6 @@ Detection of windows and doors openings and violations to prevent intruders.
 
 Patients Surveillance
 Monitoring of conditions of patients inside hospitals and in old people's home.
+
+
+Connect Alarm and Heater
