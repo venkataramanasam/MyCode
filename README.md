@@ -14,3 +14,5 @@
 1. Turn off room lights and other appliances when you are not inside the room
 2. Turn it on if you are in [and if there is no sufficient lighting]
 ***************************************************************************************************************************
+`
+1. Smart watering solution
