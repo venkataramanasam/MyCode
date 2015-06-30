@@ -1,13 +1,11 @@
 package com.tcs.flume.mme.client;
 
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.zip.GZIPInputStream;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -29,7 +25,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.flume.Event;
 import org.apache.flume.api.RpcClient;
-import org.apache.flume.api.RpcClientConfigurationConstants;
 import org.apache.flume.api.RpcClientFactory;
 import org.apache.flume.event.EventBuilder;
 import org.apache.log4j.Logger;
@@ -114,11 +109,14 @@ public class CustomFlumeClient {
 
 class MyRpcClientFacade   {
 	private RpcClient client;
-
+	public static StringBuilder sb = new StringBuilder();
 	SpoolDirectoryFileLister filesList = new SpoolDirectoryFileLister() ;
 	CustomClientSpoolStateManager filesState=new CustomClientSpoolStateManager("/tmp");
 	static List<Event> events = new ArrayList<Event>(100);
 	String spoolPath;
+	public static int readop = 0;
+	public static String record_content, record_content_bit;
+	public static int record_length = 0;
 	Logger logger = Logger.getLogger(MyRpcClientFacade.class);
 	public void init( String propertiesfile, String Spoolpath) {
 		InputStream input = null;
@@ -216,9 +214,21 @@ class MyRpcClientFacade   {
 				headers.put("timestamp",Long.toString(epoch));
 				headers.put("location", location);
 				logger.debug("Appropriate headers are added to the event.");
-				GZIPInputStream input=null;
+				/*try (FileInputStream fis = new FileInputStream(
+						"C:/Users/731846/Desktop/A20150508.0503+0100-20150508.0504+0100_2_ebs.41.raw")) {
+					//int data = fis.read();
+					while (data != -1) {
+						sb.append(String.format("%02x", data));
+						data = fis.read();
+					}*/
+				FileInputStream input=null;
 				try {
-					input = new GZIPInputStream(new FileInputStream(tempFile));
+					input = new FileInputStream(tempFile);
+					int data = input.read();
+					while (data != -1) {
+						sb.append(String.format("%02x", data));
+						data = input.read();
+					}
 				} catch (FileNotFoundException e) {
 					logger.error("Error while reading Gzipped file: "+e);
 					e.printStackTrace();
@@ -226,18 +236,23 @@ class MyRpcClientFacade   {
 					logger.error("Error on IO: "+e);
 					e.printStackTrace();
 				}
-				String content;
-				Reader decoder = new InputStreamReader(input);
-				BufferedReader br = new BufferedReader(decoder);
+				//String content;
+				//Reader decoder = new InputStreamReader(input);
+				//BufferedReader br = new BufferedReader(decoder);
 
 				int failedlines=0,loaded_lines=0,total_lines=0;
 				//List<Event> events = new ArrayList<Event>();
 
 				int batchSize = 100;
 				//int y=0;
-				while ((content = br.readLine()) != null) 
-				{
-					events.add(EventBuilder.withBody( content, Charset.forName("UTF-8"), headers ));
+				while ((sb.length() - readop) > 0) {
+					record_length = Integer.parseInt(
+							sb.substring(readop, readop + 4), 16);
+					//type = Integer.parseInt(sb.substring(readop + 4, readop + 6),16);
+					record_content = sb.substring(readop,
+							(readop + (2 * record_length)));
+					readop = readop + (2 * record_length);
+					events.add(EventBuilder.withBody( record_content, Charset.forName("UTF-8"), headers ));
 					if(events.size()==batchSize){
 						try {
 							client.appendBatch(events);
