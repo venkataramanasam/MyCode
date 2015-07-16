@@ -1,0 +1,79 @@
+package com.tcs.producer;
+
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
+
+public class TestProducer {
+	
+	
+	static Properties props;
+	static KafkaProducer<String,String> producer;
+	
+	
+	public TestProducer()
+	{
+	
+		props = new Properties();
+		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"localhost:9092");
+		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,StringSerializer.class.getName());
+		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,StringSerializer.class.getName());
+		props.put("partitioner.class", "com.tcs.producer.SimplePartitioner");
+		producer = new KafkaProducer<String,String>(props);
+		
+	}
+	
+	public static void main(String args[]) throws InterruptedException, ExecutionException {
+		
+		double latitude,longitude;
+		String patientStatus,ambulanceStatus,action;
+		String ambulanceID=null;
+		TestProducer obj=new TestProducer();
+
+		
+		boolean sync = false;
+		
+		
+		//obj.SendData(ambulanceID, latitude, longitude, patientStatus, ambulanceStatus, action);
+		
+		obj.SendData(1, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(12, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(23, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(35, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(56, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(122, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(141, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(151, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		
+		
+		producer.close();
+	}
+	
+	public boolean SendData(int ambulanceID, double latitude,double longitude,String patientStatus,String ambulanceStatus, String action )
+	{
+		String topic="ambulance_info";
+		String key = Integer.toString(ambulanceID);
+
+		try
+		{
+			if(action.contains("update_ambulanceStatus"))
+			{
+				String value=ambulanceID+","+latitude+","+longitude+","+patientStatus+","+ambulanceStatus+","+action;
+				ProducerRecord<String,String> producerRecord = new ProducerRecord<String,String>(topic, key, value);
+				producer.send(producerRecord);
+
+			}
+
+		}
+		catch(Exception e)
+		{
+			return false;
+		}
+		return true;
+	}
+}
+
