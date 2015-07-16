@@ -1,0 +1,63 @@
+package com.tcs.kafka.producer;
+import java.util.*;
+
+import kafka.javaapi.producer.Producer;
+import kafka.producer.KeyedMessage;
+import kafka.producer.ProducerConfig;
+
+public class TestProducer {
+
+	static Properties props=new Properties();
+	static ProducerConfig config;
+	static Producer<String, String> producer;
+
+
+	public static void main(String[] args) {
+		
+
+		props.put("metadata.broker.list", "broker1:9092,broker2:9092 ");
+		props.put("serializer.class", "kafka.serializer.StringEncoder");
+		props.put("partitioner.class", "example.producer.SimplePartitioner");
+		props.put("request.required.acks", "1");
+
+		config = new ProducerConfig(props);
+		producer = new Producer<String, String>(config);
+		TestProducer obj=new TestProducer();
+		
+		/*GMAIL Parsing Logic*/
+		
+//		obj.SendData(ambulanceID, latitude, longitude, patientStatus, ambulanceStatus, action)
+	
+		obj.SendData(1, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(12, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(23, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(35, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(56, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(122, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(141, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		obj.SendData(151, 12.8593, 80.2264, "not_taken", "Not_booked", "update_ambulanceStatus");
+		
+		producer.close();
+	}
+
+	public boolean SendData(int ambulanceID, double latitude,double longitude,String patientStatus,String ambulanceStatus, String action )
+	{
+
+		try
+		{
+			if(action.contains("update_ambulanceStatus"))
+			{
+				String msg=ambulanceID+","+latitude+","+longitude+","+patientStatus+","+ambulanceStatus+","+action;
+				KeyedMessage<String, String> data = new KeyedMessage<String, String>("ambulance_info",  Integer.toString(ambulanceID), msg);
+				producer.send(data);
+
+			}
+
+		}
+		catch(Exception e)
+		{
+			return false;
+		}
+		return true;
+	}
+}
