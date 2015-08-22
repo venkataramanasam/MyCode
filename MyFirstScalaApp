@@ -1,0 +1,40 @@
+package sam.trial.scalaExamples
+
+
+
+/**
+ * @author sam
+ */
+
+import org.apache.spark._
+
+object Dude {
+ 
+  def main(args: Array[String]) {
+    
+    if(args.length < 1){
+      
+      System.err.println("Give the fucking argument")
+      System.exit(1)
+    }
+    
+    val sparkconf = new SparkConf().setAppName("MyApp")
+    val sc = new SparkContext(sparkconf)
+    val file = sc.textFile(args(0))
+    
+    val mapped = file.map(s => s.length()).cache()
+    
+    for(iter <- 1 to 10){
+      
+      val start = System.currentTimeMillis()
+      
+      for(x <- mapped) { x + 2}
+      
+      val end = System.currentTimeMillis()
+      println("Iteration "+iter+" took"+(end-start))
+      
+    }
+    sc.stop()
+    }
+ 
+}
